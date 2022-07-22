@@ -1,0 +1,45 @@
+DIRECTORY=~/scripts/todoCache 
+
+calibrate (){
+    echo "calibrate start";
+    
+    num=$(ls $DIRECTORY | wc -l)
+    
+    until [ 3 -ge $num ]
+    do
+        echo "$num"
+        num=$(($num-1))
+    done
+
+
+
+
+   for FILE in $(ls -1 $DIRECTORY/* | sort -r);
+    do
+        echo $FILE;
+    done
+}
+
+while getopts n,r: aflag;
+do
+    case $aflag in
+        n)
+            echo "test";
+            exit;;
+       
+        #remove the file num in the cache
+        r)
+           # check if the file exists
+            if test -f "$DIRECTORY/$OPTARG";
+            then
+                echo "Removed $DIRECTORY/$OPTARG";
+                rm "$DIRECTORY/$OPTARG"
+            else
+                echo "Couldn't find $DIRECTORY/$OPTARG";
+            fi
+            exit;;
+        
+   esac
+done
+calibrate
+echo "no tes";
