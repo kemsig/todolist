@@ -1,45 +1,76 @@
-DIRECTORY=~/scripts/todoCache 
+#!/bin/bash
+DIRECTORY=$HOME/scriptcache/todoCache
+#check if there is a directory called scriptcache in $HOME directory if not create one
+if [ ! -d $HOME/scriptcache ]; then
+    mkdir $HOME/scriptcache
+    echo "created scriptcache directory"
+   #check if there is a directory called todoCache if not create one
+    if [ ! -d $HOME/scripts/todoCache ]; then
+        mkdir $HOME/scripts/todoCache
+        echo "created todoCache directory"
+    fi
+fi
+#print function all of the contents of the todoCache directory
+printCache() {
+    clear
+    echo "What TODO:"
+    echo "----------------------------------------------------"
+    for i in $(ls $DIRECTORY); do
+        echo "$i) $(cat $DIRECTORY/$i)"
+        echo $'\n'
+    done
+    echo "----------------------------------------------------"
+}
 
 calibrate (){
     echo "calibrate start";
-    
-    num=$(ls $DIRECTORY | wc -l)
-    
-    until [ 3 -ge $num ]
+    num=$(($(ls $DIRECTORY | wc -l)-1));
+    i=$1;
+
+    #while loop that skips
+    while [ $i -le $num ]
     do
-        echo "$num"
-        num=$(($num-1))
+        echo "$i"
+        #write the contents of DIRECTORY/$i+1 to DIRECTORY/$i
+        cp $DIRECTORY/$(($i+1)) $DIRECTORY/$i
+
+        i=$(($i+1))
     done
 
+    rm $DIRECTORY/$(($num+1))
 
 
 
-   for FILE in $(ls -1 $DIRECTORY/* | sort -r);
-    do
-        echo $FILE;
-    done
+#   for FILE in $(ls -1 $DIRECTORY/* | sort -r);
+ #   do
+  #      echo $FILE;
+   # done
 }
 
 while getopts n,r: aflag;
 do
     case $aflag in
         n)
-            echo "test";
+            num=$(($(ls $DIRECTORY | wc -l)+1));
+            touch $DIRECTORY/$num;
+            echo "$@" >> $DIRECTORY/$num;
+            echo "added todo";
+            printCache;
             exit;;
-       
+
         #remove the file num in the cache
         r)
            # check if the file exists
             if test -f "$DIRECTORY/$OPTARG";
             then
                 echo "Removed $DIRECTORY/$OPTARG";
-                rm "$DIRECTORY/$OPTARG"
+                calibrate $OPTARG;
             else
                 echo "Couldn't find $DIRECTORY/$OPTARG";
             fi
+            printCache;
             exit;;
-        
+
    esac
 done
-calibrate
-echo "no tes";
+printCache;
